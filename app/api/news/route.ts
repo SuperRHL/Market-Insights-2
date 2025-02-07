@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import * as cheerio from 'cheerio'
 
+export const runtime = 'nodejs';
+
 export async function GET() {
   try {
     const response = await fetch('https://www.nasdaq.com/feed/rssoutbound?category=Nasdaq')
