@@ -5,9 +5,23 @@ export const runtime = 'nodejs';
 
 export async function GET() {
   try {
-    const response = await fetch('https://www.nasdaq.com/feed/rssoutbound?category=Nasdaq')
-    const data = await response.text()
-    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+    const response = await fetch('https://www.nasdaq.com/feed/rssoutbound?category=Nasdaq', {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.text();
+    if (!data) {
+      throw new Error('Empty response received');
+    }
+
     const $ = cheerio.load(data, { xmlMode: true })
     const items = $('item').map((_, item) => {
       const $item = $(item)
@@ -29,6 +43,10 @@ export async function GET() {
 
     return NextResponse.json(items)
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch news' }, { status: 500 })
+    console.error('News fetch error:', error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to fetch news' },
+      { status: 500 }
+    );
   }
 }
