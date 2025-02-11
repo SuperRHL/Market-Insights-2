@@ -29,55 +29,57 @@ export function BentoGrid() {
 
   return (
     <MarketProvider>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Large feature card */}
-        <Card className="md:col-span-2 md:row-span-2">
-          <CardHeader>
-            <CardTitle className={typography.h3}>Market Overview</CardTitle>
-            <CardDescription className={typography.p}>Real-time market insights and trends</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StockChart />
-          </CardContent>
-        </Card>
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Large feature card */}
+          <Card className="md:col-span-2 md:row-span-2">
+            <CardHeader>
+              <CardTitle className={typography.h3}>Market Overview</CardTitle>
+              <CardDescription className={typography.p}>Real-time market insights and trends</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StockChart ticker="SPY"/>
+            </CardContent>
+          </Card>
 
-        {/* Regular cards */}
-        <Card>
-          <CardHeader>
-            <CardTitle className={typography.h3}>Top Gainers</CardTitle>
-            <CardDescription className={typography.p}>Biggest price increases</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TopMovers />
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className={typography.h3}>Top Losers</CardTitle>
-            <CardDescription className={typography.p}>Biggest price drops</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TopLosers />
-          </CardContent>
-        </Card>
+          {/* Regular cards */}
+          <Card>
+            <CardHeader>
+              <CardTitle className={typography.h3}>Top Gainers</CardTitle>
+              <CardDescription className={typography.p}>Biggest price increases</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TopMovers />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className={typography.h3}>Top Losers</CardTitle>
+              <CardDescription className={typography.p}>Biggest price drops</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TopLosers />
+            </CardContent>
+          </Card>
 
-        {/* Three vertical cards - stack on mobile, side by side on desktop */}
-        <div className="space-y-4 md:space-y-4">
-          <CryptoCard />
-          <ForexMarketStatusCard />
-          <SectorPerformance />
+          {/* Three vertical cards - stack on mobile, side by side on desktop */}
+          <div className="space-y-6 md:space-y-6">
+            <CryptoCard />
+            <ForexMarketStatusCard />
+            <SectorPerformance />
+          </div>
+
+          {/* News card */}
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <CardTitle className={typography.h3}>Market News</CardTitle>
+              <CardDescription className={typography.p}>Latest updates and headlines</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <NewsSection />
+            </CardContent>
+          </Card>
         </div>
-
-        {/* News card */}
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className={typography.h3}>Market News</CardTitle>
-            <CardDescription className={typography.p}>Latest updates and headlines</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <NewsSection />
-          </CardContent>
-        </Card>
       </div>
     </MarketProvider>
   )

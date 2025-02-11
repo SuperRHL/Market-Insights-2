@@ -44,7 +44,7 @@ export async function fetchActiveStocks() {
     }
     
     const data = await response.json();
-    console.log(data)
+
     return data;
   } catch (error) {
     console.error('Fetch error:', error);
@@ -63,7 +63,7 @@ export async function fetchCryptoQuotes() {
     }
     
     const data = await response.json();
-    console.log('Crypto response:', data); // Add logging to see response structure
+
     return data;
   } catch (error) {
     console.error('Fetch error:', error);

@@ -40,7 +40,7 @@ export function CommandMenu() {
 
     const handleSearch = () => {
         if (query.trim()) {
-            router.push(`/search/${encodeURIComponent(query.trim())}`)
+            router.push(`/search/${encodeURIComponent(query.toUpperCase().trim())}`)
             setIsOpen(false)
             setQuery("")
         }

@@ -12,14 +12,6 @@ import { ChartContainer, ChartTooltip } from './ui/chart'
 
 const timeframes: TimeFrame[] = ['1D', '5D', '1M', '6M', 'YTD', '1Y', '5Y']
 
-// Update chart config to match the container's expected format
-const chartConfig = {
-  desktop: {
-    label: "S&P 500",
-    color: "hsl(var(--chart-1))",
-  },
-} as const
-
 /**
  * Represents the stock data for a given timestamp.
  * 
@@ -33,7 +25,7 @@ type StockData = {
   ma20?: number
 }
 
-export function StockChart() {
+export function StockChart({ ticker }: { ticker: string }) {
   const [data, setData] = useState<StockData[]>([])
   const [timeframe, setTimeframe] = useState<TimeFrame>('1D')
   const [loading, setLoading] = useState(true)
@@ -42,6 +34,14 @@ export function StockChart() {
   const [priceChange, setPriceChange] = useState<number | null>(null)
   const [marketOpen, setMarketOpen] = useState(false)
   const [priceRange, setPriceRange] = useState<{ min: number; max: number } | null>(null)
+
+  // Update chart config to use the ticker
+  const chartConfig = {
+    desktop: {
+      label: ticker,
+      color: "hsl(var(--chart-1))",
+    },
+  } as const
 
   const formatXAxisTick = (value: string) => {
     const date = new Date(value)
@@ -105,7 +105,7 @@ export function StockChart() {
       try {
         setLoading(true)
         setError(null)
-        const stockData = await fetchStockData('SPY', timeframe)
+        const stockData = await fetchStockData(ticker, timeframe)
         
         if (stockData && stockData.length > 0) {
           const formattedData: StockData[] = stockData
@@ -146,7 +146,7 @@ export function StockChart() {
     }
 
     fetchData()
-  }, [timeframe])
+  }, [timeframe, ticker])
 
   if (error) {
     return (
@@ -157,24 +157,24 @@ export function StockChart() {
   }
 
   return (
-    <div className="w-full h-full space-y-6">
+    <div className="w-full h-full space-y-6 pt-6">
       <div className="flex justify-between items-center">
         <div>
-          <h3 className={typography.h3}>S&P 500</h3>
+          <div className={typography.h3}>{ticker}</div>
           {loading ? (
             <Skeleton className="h-6 w-24" />
           ) : (
             <div className="flex gap-2">
               <span className={typography.p}>${currentPrice?.toFixed(2)}</span>
-              <span className={`${priceChange && priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {priceChange?.toFixed(2)}%
+              <span className={`${typography.p} ${priceChange && priceChange >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {priceChange && priceChange >= 0 ? '▲' : '▼'} {Math.abs(priceChange || 0).toFixed(2)}%
               </span>
             </div>
           )}
         </div>
         <ToggleGroup type="single" value={timeframe} onValueChange={(value) => value && setTimeframe(value as TimeFrame)}>
           {timeframes.map((tf) => (
-            <ToggleGroupItem key={tf} value={tf} aria-label={`${tf} timeframe`}>
+            <ToggleGroupItem key={tf} value={tf} aria-label={`${tf} timeframe`} className={typography.p}>
               {tf}
             </ToggleGroupItem>
           ))}
@@ -257,7 +257,7 @@ export function StockChart() {
         )}
       </div>
       <div className="flex flex-col items-start gap-4 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
+        <div className={`${typography.p} flex gap-2 font-medium leading-none`}>
           {priceChange && priceChange >= 0 ? (
             <>Trending up by {priceChange.toFixed(2)}% <TrendingUp className="h-4 w-4" /></>
           ) : (
@@ -265,28 +265,21 @@ export function StockChart() {
           )}
         </div>
         <div className="w-full grid grid-cols-4 gap-4 p-4 rounded-lg border bg-card">
-          <div className="flex flex-col justify-between text-center">
-            <p className="text-xs text-muted-foreground">Open</p>
-            <p className="font-medium mt-1">${data[0]?.price.toFixed(2) || '-'}</p>
-          </div>
-          <div className="flex flex-col justify-between text-center">
-            <p className="text-xs text-muted-foreground">High</p>
-            <p className="font-medium mt-1">${Math.max(...data.map(d => d.price)).toFixed(2)}</p>
-          </div>
-          <div className="flex flex-col justify-between text-center">
-            <p className="text-xs text-muted-foreground">Low</p>
-            <p className="font-medium mt-1">${Math.min(...data.map(d => d.price)).toFixed(2)}</p>
-          </div>
-          <div className="flex flex-col justify-between text-center">
-            <p className="text-xs text-muted-foreground">Range</p>
-            <p className="font-medium mt-1">
-              {priceRange ? 
-                `${((priceRange.max - priceRange.min) / priceRange.min * 100).toFixed(2)}%` 
-                : '-'}
-            </p>
-          </div>
+          {['Open', 'High', 'Low', 'Range'].map((label) => (
+            <div key={label} className="flex flex-col justify-between text-center">
+              <p className={`${typography.p} text-xs text-muted-foreground`}>{label}</p>
+              <p className={`${typography.p} font-medium mt-1`}>
+                {label === 'Open' && `$${data[0]?.price.toFixed(2) || '-'}`}
+                {label === 'High' && `$${Math.max(...data.map(d => d.price)).toFixed(2)}`}
+                {label === 'Low' && `$${Math.min(...data.map(d => d.price)).toFixed(2)}`}
+                {label === 'Range' && (priceRange ? 
+                  `${((priceRange.max - priceRange.min) / priceRange.min * 100).toFixed(2)}%` 
+                  : '-')}
+              </p>
+            </div>
+          ))}
         </div>
-        <div className="flex justify-between w-full text-xs text-muted-foreground">
+        <div className={`${typography.p} flex justify-between w-full text-xs text-muted-foreground`}>
           <span>
             Market {marketOpen ? 
               <span className="text-green-500">Open</span> : 
@@ -294,8 +287,8 @@ export function StockChart() {
           </span>
           <span>MA(20): ${data[data.length - 1]?.ma20?.toFixed(2) || '-'}</span>
         </div>
-        <div className="leading-none text-muted-foreground">
-          Showing S&P 500 performance for the selected timeframe
+        <div className={`${typography.p} leading-none text-muted-foreground`}>
+          Showing {ticker} performance for the selected timeframe
         </div>
       </div>
     </div>
