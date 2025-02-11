@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { memo } from 'react'
 import { typography } from "@/styles/typography"
 import { cn } from "@/lib/utils"
+import Link from 'next/link'
 
 // SkeletonLoader Component
 const SkeletonLoader = memo(() => (
@@ -43,8 +44,11 @@ export function TopMovers() {
             <Button 
               variant="link" 
               className={cn("h-auto p-0 font-medium", typography.h4)}
+              asChild
             >
-              {stock.symbol}
+              <Link href={`/stock/${stock.symbol}`}>
+                {stock.symbol}
+              </Link>
             </Button>
             <div className="flex flex-col items-end">
               <div className={cn("text-sm", typography.p)}>${stock.price?.toFixed(2)}</div>

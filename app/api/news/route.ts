@@ -66,7 +66,7 @@ export async function GET() {
         description: description.length > 150 ? description.substring(0, 150) + '...' : description,
         link: $item.find('link').text()
       }
-    }).get().slice(0, 10)
+    }).get().slice(0, 11)
 
     // Cache the results
     cachedData = items;
